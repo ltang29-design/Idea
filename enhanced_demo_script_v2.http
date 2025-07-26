@@ -1,0 +1,252 @@
+### Enhanced Profile Authenticity Classifier API v2.0 Demo Script
+### Featuring Sentiment Analysis & IsolationForest Anomaly Detection
+
+### 1. Health Check
+GET http://localhost:8000/health
+
+### 2. Model Information
+GET http://localhost:8000/model-info
+
+### 3. Single Profile Validation - Authentic Profile (Low Risk)
+POST http://localhost:8000/validate-profile
+Content-Type: application/json
+
+{
+  "name": "John Smith",
+  "email": "john.smith@gmail.com",
+  "address": "123 Main St, New York, NY",
+  "job_history": [
+    {
+      "title": "Software Engineer",
+      "company": "Google",
+      "start": 2015,
+      "end": 2019
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Microsoft",
+      "start": 2019,
+      "end": 2022
+    }
+  ],
+  "education": [
+    {
+      "school": "Harvard University",
+      "degree": "BSc Computer Science"
+    }
+  ],
+  "photo_flag": 0
+}
+
+### 4. Single Profile Validation - AI-Generated Content (High Risk)
+POST http://localhost:8000/validate-profile
+Content-Type: application/json
+
+{
+  "name": "Alexandra Rodriguez",
+  "email": "alex.rodriguez@outlook.com",
+  "address": "456 Innovation Drive, Tech City, CA",
+  "job_history": [
+    {
+      "title": "Exceptional Senior Software Engineer",
+      "company": "Outstanding Tech Solutions Inc",
+      "start": 2018,
+      "end": 2022
+    },
+    {
+      "title": "Remarkable Lead Developer",
+      "company": "Fantastic Digital Innovations",
+      "start": 2022,
+      "end": 2024
+    }
+  ],
+  "education": [
+    {
+      "school": "Phenomenal University",
+      "degree": "Brilliant Computer Science Degree"
+    }
+  ],
+  "photo_flag": 0
+}
+
+### 5. Single Profile Validation - Fake Profile with Multiple Red Flags
+POST http://localhost:8000/validate-profile
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "user1234@yahoo.com",
+  "address": "404 Not Found St, Faketown",
+  "job_history": [
+    {
+      "title": "Chief Visionary",
+      "company": "Fakester Inc",
+      "start": 2018,
+      "end": 2020
+    },
+    {
+      "title": "Ninja Developer",
+      "company": "ScamCo",
+      "start": 2019,
+      "end": 2021
+    }
+  ],
+  "education": [
+    {
+      "school": "Fake University",
+      "degree": "Diploma in Business"
+    }
+  ],
+  "photo_flag": 1
+}
+
+### 6. Single Profile Validation - Cultural Mismatch (Medium Risk)
+POST http://localhost:8000/validate-profile
+Content-Type: application/json
+
+{
+  "name": "Emily Chen",
+  "email": "emily.chen@gmail.com",
+  "address": "789 Pine Rd, Chicago, IL",
+  "job_history": [
+    {
+      "title": "Data Scientist",
+      "company": "Amazon",
+      "start": 2017,
+      "end": 2021
+    }
+  ],
+  "education": [
+    {
+      "school": "Tsinghua University",
+      "degree": "MSc Computer Science"
+    }
+  ],
+  "photo_flag": 1
+}
+
+### 7. Batch Profile Validation - Mixed Risk Levels
+POST http://localhost:8000/batch-validate
+Content-Type: application/json
+
+{
+  "profiles": [
+    {
+      "name": "Anna Ivanova",
+      "email": "anna.ivanova@outlook.com",
+      "address": "456 Oak Ave, San Francisco, CA",
+      "job_history": [
+        {
+          "title": "Software Engineer",
+          "company": "Tesla",
+          "start": 2016,
+          "end": 2020
+        }
+      ],
+      "education": [
+        {
+          "school": "MIT",
+          "degree": "PhD Computer Science"
+        }
+      ],
+      "photo_flag": 0
+    },
+    {
+      "name": "Chris P Bacon",
+      "email": "chris.bacon@temp-mail.org",
+      "address": "1 Infinite Loop, Nowhere",
+      "job_history": [
+        {
+          "title": "Hacker",
+          "company": "Phony LLC",
+          "start": 2019,
+          "end": 2022
+        }
+      ],
+      "education": [
+        {
+          "school": "Diploma Mill College",
+          "degree": "Certificate in Programming"
+        }
+      ],
+      "photo_flag": 1
+    },
+    {
+      "name": "David Kim",
+      "email": "david.kim@microsoft.com",
+      "address": "321 Tech Blvd, Seattle, WA",
+      "job_history": [
+        {
+          "title": "Product Manager",
+          "company": "Microsoft",
+          "start": 2018,
+          "end": 2023
+        }
+      ],
+      "education": [
+        {
+          "school": "Stanford University",
+          "degree": "MBA"
+        }
+      ],
+      "photo_flag": 0
+    },
+    {
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@amazing-company.com",
+      "address": "789 Excellence Avenue, Success City",
+      "job_history": [
+        {
+          "title": "Outstanding Senior Developer",
+          "company": "Incredible Tech Solutions",
+          "start": 2020,
+          "end": 2024
+        }
+      ],
+      "education": [
+        {
+          "school": "Phenomenal Institute of Technology",
+          "degree": "Brilliant Engineering Degree"
+        }
+      ],
+      "photo_flag": 0
+    }
+  ]
+}
+
+### 8. Root Endpoint
+GET http://localhost:8000/
+
+### Expected Responses:
+
+### For Authentic Profile (Example 3):
+# Expected: Low risk, high authenticity score, few flags
+# - isolation_anomaly: false
+# - sentiment_polarity: moderate
+# - individual_scores: balanced across models
+
+### For AI-Generated Content (Example 4):
+# Expected: High risk due to overly positive sentiment
+# - isolation_anomaly: likely true
+# - sentiment_polarity: very high (>0.7)
+# - flags: "Overly positive sentiment detected (possible AI-generated content)"
+# - ai_phrase_count: high
+
+### For Fake Profile (Example 5):
+# Expected: High risk, multiple red flags
+# - isolation_anomaly: true
+# - flags: Multiple including timeline overlaps, suspicious degree, etc.
+# - individual_scores: high fake probability across models
+
+### For Cultural Mismatch (Example 6):
+# Expected: Medium risk
+# - flags: "Cultural inconsistency detected"
+# - isolation_anomaly: possible
+# - sentiment_polarity: moderate
+
+### For Batch Validation:
+# Expected: Summary with statistics for all 4 profiles including:
+# - Average authenticity scores
+# - Risk level distribution
+# - IsolationForest anomaly detection results
+# - Sentiment analysis insights 
